@@ -1,0 +1,228 @@
+app.js 
+
+const pokemonListElement = document.getElementById('pokemon-list');
+const pokemonDetailsElement = document.getElementById('pokemon-details');
+const searchInput = document.getElementById('search');
+const loadingElement = document.getElementById('loading');
+
+const API_URL = 'https://pokeapi.co/api/v2/pokemon';
+
+function fetchPokemonList() {
+    loadingElement.style.display = 'block';  
+    fetch(API_URL + '?limit=20')
+        .then(response => response.json())
+        .then(data => {
+            loadingElement.style.display = 'none';  
+            renderPokemonList(data.results);  
+        })
+        .catch(() => {
+            loadingElement.style.display = 'none';
+            alert('Błąd pobierania danych.');
+        });
+}
+
+function renderPokemonList(pokemons) {
+    pokemonListElement.innerHTML = '';  
+    pokemons.forEach((pokemon, index) => {
+        
+        const pokemonCard = document.createElement('div');
+        pokemonCard.classList.add('pokemon-card');
+        
+    
+        const pokemonImage = document.createElement('img');
+        pokemonImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png`;
+        pokemonImage.alt = pokemon.name;
+
+        const pokemonName = document.createElement('h3');
+        pokemonName.textContent = pokemon.name;
+
+        const pokemonNumber = document.createElement('p');
+        pokemonNumber.textContent = `#${index + 1}`;
+
+        
+        pokemonCard.addEventListener('click', () => {
+            fetchPokemonDetails(index + 1); 
+        });
+
+        
+        pokemonCard.appendChild(pokemonImage);
+        pokemonCard.appendChild(pokemonName);
+        pokemonCard.appendChild(pokemonNumber);
+
+        pokemonListElement.appendChild(pokemonCard);
+    });
+}
+
+function fetchPokemonDetails(id) {
+    loadingElement.style.display = 'block';  
+    fetch(`${API_URL}/${id}`)
+        .then(response => response.json())
+        .then(pokemon => {
+            loadingElement.style.display = 'none';  
+            renderPokemonDetails(pokemon); 
+        })
+        .catch(() => {
+            loadingElement.style.display = 'none';
+            alert('Błąd pobierania szczegółów.');
+        });
+}
+
+function renderPokemonDetails(pokemon) {
+    pokemonDetailsElement.style.display = 'block';  
+    
+    pokemonDetailsElement.innerHTML = '';
+
+    const pokemonTitle = document.createElement('h2');
+    pokemonTitle.textContent = pokemon.name;
+
+    const pokemonImage = document.createElement('img');
+    pokemonImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+    pokemonImage.alt = pokemon.name;
+
+    const pokemonTypes = document.createElement('h3');
+    pokemonTypes.textContent = 'Typy:';
+    const typesList = document.createElement('ul');
+    pokemon.types.forEach(type => {
+        const typeItem = document.createElement('li');
+        typeItem.textContent = type.type.name;
+        typesList.appendChild(typeItem);
+    });
+
+    const pokemonStats = document.createElement('h3');
+    pokemonStats.textContent = 'Statystyki:';
+    const statsList = document.createElement('ul');
+    pokemon.stats.forEach(stat => {
+        const statItem = document.createElement('li');
+        statItem.textContent = `${stat.stat.name}: ${stat.base_stat}`;
+        statsList.appendChild(statItem);
+    });
+
+    const pokemonHeight = document.createElement('h3');
+    pokemonHeight.textContent = `Wzrost: ${pokemon.height / 10} m`;
+
+    const pokemonWeight = document.createElement('h3');
+    pokemonWeight.textContent = `Waga: ${pokemon.weight / 10} kg`;
+
+    pokemonDetailsElement.appendChild(pokemonTitle);
+    pokemonDetailsElement.appendChild(pokemonImage);
+    pokemonDetailsElement.appendChild(pokemonTypes);
+    pokemonDetailsElement.appendChild(typesList);
+    pokemonDetailsElement.appendChild(pokemonStats);
+    pokemonDetailsElement.appendChild(statsList);
+    pokemonDetailsElement.appendChild(pokemonHeight);
+    pokemonDetailsElement.appendChild(pokemonWeight);
+}
+
+
+searchInput.addEventListener('input', function() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const allCards = document.querySelectorAll('.pokemon-card');
+    allCards.forEach(card => {
+        const pokemonName = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = pokemonName.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+fetchPokemonList();  
+
+
+index.html
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon GO Helper</title>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pokemon GO Helper</h1>
+            <input type="text" id="search" placeholder="Wyszukaj Pokemona..." />
+        </header>
+        
+        <div id="pokemon-list" class="pokemon-list">
+        </div>
+        
+        <div id="pokemon-details" class="pokemon-details">
+        </div>
+        
+        <div id="loading" class="loading">
+            <p>Ładowanie...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script> 
+</html>
+
+
+index.css
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin: 20px 0;
+}
+
+input {
+    padding: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.pokemon-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.pokemon-card {
+    width: 150px;
+    text-align: center;
+    background-color: white;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.pokemon-card:hover {
+    transform: scale(1.05);
+}
+
+.pokemon-card img {
+    width: 100px;
+    height: 100px;
+}
+
+.pokemon-details {
+    display: none;
+    background-color: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+    text-align: center;
+    display: none;
+}
+
