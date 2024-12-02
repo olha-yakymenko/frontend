@@ -1,131 +1,3 @@
-app.js 
-
-const pokemonListElement = document.getElementById('pokemon-list');
-const pokemonDetailsElement = document.getElementById('pokemon-details');
-const searchInput = document.getElementById('search');
-const loadingElement = document.getElementById('loading');
-
-const API_URL = 'https://pokeapi.co/api/v2/pokemon';
-
-function fetchPokemonList() {
-    loadingElement.style.display = 'block';  
-    fetch(API_URL + '?limit=20')
-        .then(response => response.json())
-        .then(data => {
-            loadingElement.style.display = 'none';  
-            renderPokemonList(data.results);  
-        })
-        .catch(() => {
-            loadingElement.style.display = 'none';
-            alert('Błąd pobierania danych.');
-        });
-}
-
-function renderPokemonList(pokemons) {
-    pokemonListElement.innerHTML = '';  
-    pokemons.forEach((pokemon, index) => {
-        
-        const pokemonCard = document.createElement('div');
-        pokemonCard.classList.add('pokemon-card');
-        
-    
-        const pokemonImage = document.createElement('img');
-        pokemonImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${index + 1}.png`;
-        pokemonImage.alt = pokemon.name;
-
-        const pokemonName = document.createElement('h3');
-        pokemonName.textContent = pokemon.name;
-
-        const pokemonNumber = document.createElement('p');
-        pokemonNumber.textContent = `#${index + 1}`;
-
-        
-        pokemonCard.addEventListener('click', () => {
-            fetchPokemonDetails(index + 1); 
-        });
-
-        
-        pokemonCard.appendChild(pokemonImage);
-        pokemonCard.appendChild(pokemonName);
-        pokemonCard.appendChild(pokemonNumber);
-
-        pokemonListElement.appendChild(pokemonCard);
-    });
-}
-
-function fetchPokemonDetails(id) {
-    loadingElement.style.display = 'block';  
-    fetch(`${API_URL}/${id}`)
-        .then(response => response.json())
-        .then(pokemon => {
-            loadingElement.style.display = 'none';  
-            renderPokemonDetails(pokemon); 
-        })
-        .catch(() => {
-            loadingElement.style.display = 'none';
-            alert('Błąd pobierania szczegółów.');
-        });
-}
-
-function renderPokemonDetails(pokemon) {
-    pokemonDetailsElement.style.display = 'block';  
-    
-    pokemonDetailsElement.innerHTML = '';
-
-    const pokemonTitle = document.createElement('h2');
-    pokemonTitle.textContent = pokemon.name;
-
-    const pokemonImage = document.createElement('img');
-    pokemonImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-    pokemonImage.alt = pokemon.name;
-
-    const pokemonTypes = document.createElement('h3');
-    pokemonTypes.textContent = 'Typy:';
-    const typesList = document.createElement('ul');
-    pokemon.types.forEach(type => {
-        const typeItem = document.createElement('li');
-        typeItem.textContent = type.type.name;
-        typesList.appendChild(typeItem);
-    });
-
-    const pokemonStats = document.createElement('h3');
-    pokemonStats.textContent = 'Statystyki:';
-    const statsList = document.createElement('ul');
-    pokemon.stats.forEach(stat => {
-        const statItem = document.createElement('li');
-        statItem.textContent = `${stat.stat.name}: ${stat.base_stat}`;
-        statsList.appendChild(statItem);
-    });
-
-    const pokemonHeight = document.createElement('h3');
-    pokemonHeight.textContent = `Wzrost: ${pokemon.height / 10} m`;
-
-    const pokemonWeight = document.createElement('h3');
-    pokemonWeight.textContent = `Waga: ${pokemon.weight / 10} kg`;
-
-    pokemonDetailsElement.appendChild(pokemonTitle);
-    pokemonDetailsElement.appendChild(pokemonImage);
-    pokemonDetailsElement.appendChild(pokemonTypes);
-    pokemonDetailsElement.appendChild(typesList);
-    pokemonDetailsElement.appendChild(pokemonStats);
-    pokemonDetailsElement.appendChild(statsList);
-    pokemonDetailsElement.appendChild(pokemonHeight);
-    pokemonDetailsElement.appendChild(pokemonWeight);
-}
-
-
-searchInput.addEventListener('input', function() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const allCards = document.querySelectorAll('.pokemon-card');
-    allCards.forEach(card => {
-        const pokemonName = card.querySelector('h3').textContent.toLowerCase();
-        card.style.display = pokemonName.includes(searchTerm) ? '' : 'none';
-    });
-});
-
-fetchPokemonList();  
-
-
 index.html
 
 <!DOCTYPE html>
@@ -133,15 +5,16 @@ index.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon GO Helper</title>
+    <title>Pokemon</title>
     <link rel="stylesheet" href="styles.css"> 
 </head>
-<body>
-    <div class="container">
+<body>   
         <header>
-            <h1>Pokemon GO Helper</h1>
+            <h1>Pokemon Go</h1>
             <input type="text" id="search" placeholder="Wyszukaj Pokemona..." />
         </header>
+    <div class="container">
+
         
         <div id="pokemon-list" class="pokemon-list">
         </div>
@@ -157,24 +30,179 @@ index.html
     <script src="app.js"></script> 
 </html>
 
+app.js
 
-index.css
+const pokemon_list=document.getElementById('pokemon-list')
+const pokemon_details=document.getElementById('pokemon-details')
+const search=document.getElementById('search')
+const loading=document.getElementById('loading')
+
+const API_URL = 'https://pokeapi.co/api/v2/pokemon'
+
+async function fetchListPokemons(){
+    loading.style.display='block'
+    const response=await fetch(API_URL+'?limit=20')
+    if (!response.ok){
+        loading.style.display='none'
+        console.error("Brak podczas pobierania")
+        return
+    }
+    data=await response.json()
+    loading.style.display='none'
+    showList(data.results)
+}
+
+function showList(pokemons){
+    pokemon_list.innerHTML=''
+    const elements=pokemons.map((pokemon) =>{
+        const pokemonId=pokemon.url.split('/').filter(Boolean).pop()
+        return fetch(`${API_URL}/${pokemonId}`)
+        .then(response=> response.json())
+        .then(pokemonData =>{
+            return {
+                pokemonId,
+                name: pokemon.name,
+                image:pokemonData.sprites.front_default
+            }
+        })
+        .catch(error =>{
+            console.error("Blad przy pobieraniu szczegolow")
+        })
+    })
+
+    Promise.all(elements).then(elements =>{
+        elements.map(elem =>{
+            const pokemonCard=document.createElement('div')
+            pokemonCard.classList.add('pokemon-card')
+
+            const pokemonImage=document.createElement('img')
+            pokemonImage.src=elem.image
+            pokemonImage.alt=elem.name
+
+            const pokemonName=document.createElement('h3')
+            pokemonName.textContent=elem.name 
+
+            const pokemonId=document.createElement('p')
+            pokemonId.textContent=elem.pokemonId
+
+            pokemonCard.addEventListener('click', () =>{
+                fetchPokemonDetails(elem.pokemonId)
+            })
+
+            pokemonCard.appendChild(pokemonImage)
+            pokemonCard.appendChild(pokemonName)
+            pokemonCard.appendChild(pokemonId)
+            pokemon_list.appendChild(pokemonCard)
+        })
+    })
+}
+
+async function fetchPokemonDetails(id){
+    loading.style.display='block'
+    const response = await fetch(`${API_URL}/${id}`)
+
+    if (response.ok){
+        const pokemon=await response.json()
+        loading.style.display = 'none'
+        showDetails(pokemon)
+    }else{
+        loading.style.display='none'
+        console.error('Blad pobierania szczegolow')
+    }
+}
+
+function showDetails(pokemon){
+    pokemon_details.style.display='block'
+    pokemon_details.innerHTML=''
+
+    const pokemonName=document.createElement('h3')
+    pokemonName.textContent=pokemon.name
+
+    const pokemonImage=document.createElement('img')
+    pokemonImage.src=`${pokemon.sprites.front_default}`
+    pokemonImage.alt=pokemon.name
+
+    const pokemonTypes=document.createElement('h2')
+    pokemonTypes.textContent='Typy:'
+    const typesList=document.createElement('ul')
+    pokemon.types.map(type => {
+        const typeItem=document.createElement('li')
+        typeItem.textContent=type.type.name
+        typesList.appendChild(typeItem)
+    })
+
+    const pokemonStats=document.createElement('h2')
+    pokemonStats.textContent='Statystyki:'
+    const statsList=document.createElement('ul')
+    pokemon.stats.map(stat =>{
+        const statItem=document.createElement('li')
+        statItem.textContent=`${stat.stat.name}: ${stat.base_stat}`
+        statsList.appendChild(statItem)
+    })
+
+    const pokemonHeight = document.createElement('h2');
+    pokemonHeight.textContent = `Wzrost: ${pokemon.height}`;
+
+    const pokemonWeight=document.createElement('h2')
+    pokemonWeight.textContent=`Waga: ${pokemon.weight}`
+
+    const closeButton=document.createElement('div')
+    closeButton.classList.add('close-button')
+    closeButton.textContent='X'
+    closeButton.addEventListener('click', ()=>{
+        pokemon_details.innerHTML=''
+        pokemon_details.style.display='none'
+    })
+
+    pokemon_details.appendChild(closeButton)
+    pokemon_details.appendChild(pokemonName)
+    pokemon_details.appendChild(pokemonImage)
+    pokemon_details.appendChild(pokemonTypes)
+    pokemon_details.appendChild(typesList)
+    pokemon_details.appendChild(pokemonStats)
+    pokemon_details.appendChild(statsList)
+    pokemon_details.appendChild(pokemonHeight)
+    pokemon_details.appendChild(pokemonWeight)
+}
+
+search.addEventListener('input', function() {
+    const searchTerm = search.value.toLowerCase();
+    const allCards = [...document.querySelectorAll('.pokemon-card')];
+    allCards.map(card => {
+        const pokemonName = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = pokemonName.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+fetchListPokemons()
+
+styles.css
 
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f9;
     margin: 0;
     padding: 0;
+    height:auto;
+    width:auto;
 }
 
 .container {
     width: 80%;
     margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 500px;
+    height: auto;
 }
 
 header {
     text-align: center;
     margin: 20px 0;
+}
+img{
+    height: 140px;
+    width: 300px;
 }
 
 input {
@@ -190,6 +218,9 @@ input {
     flex-wrap: wrap;
     justify-content: space-around;
     margin-top: 20px;
+    width: 100%;
+    height: 217px;
+
 }
 
 .pokemon-card {
@@ -201,6 +232,7 @@ input {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    height: auto;
 }
 
 .pokemon-card:hover {
@@ -208,21 +240,52 @@ input {
 }
 
 .pokemon-card img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
+}
+.pokemon-card h2{
+    font-size:  25px;;
+}
+.pokemon-card p{
+    font-size: 17px;
+    font-style: italic;
 }
 
 .pokemon-details {
     display: none;
     background-color: white;
     padding: 20px;
+    margin: auto;
     margin-top: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+
+}
+.pokemon-details h2{
+    text-align: center;
+    font-size: 25px;
+}
+.pokemon-details h3{
+    text-align: center;
+    text-transform:capitalize;
+    font-size: 30px;
+}
+.pokemon-details li{
+    font-size: 20px;
+}
+.pokemon-details img{
+    height: 150px;
+    width: 150px;
 }
 
 .loading {
     text-align: center;
     display: none;
+    font-weight: bold;
 }
 
+.close-button {
+    text-align: right;
+    cursor: pointer;
+} 
