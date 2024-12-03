@@ -94,7 +94,8 @@ function showList(pokemons){
             pokemonCard.appendChild(pokemonId)
             pokemon_list.appendChild(pokemonCard)
         })
-    })
+    }).catch(error => console.error("Blad przy pobieraniu danych"))
+
 }
 
 async function fetchPokemonDetails(id){
