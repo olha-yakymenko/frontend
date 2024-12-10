@@ -1,188 +1,444 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon</title>
-    <link rel="stylesheet" href="styles.css"> 
-</head>
-<body>   
-    <script
-        src="https://unpkg.com/react@18/umd/react.development.js">
-    </script>
-    <script
-        src="https://unpkg.com/react-dom@18/umd/react-dom.development.js">
-    </script>
 
-    <script
-        src="https://unpkg.com/@babel/standalone/babel.min.js">
-    </script>
+ <!DOCTYPE html>
+ <html lang="pl">
+ <head>
+     <meta charset="utf-8" />
+     <title>Pokemon App</title>
+     <link rel="stylesheet" href="styles.css" /> 
+ </head>
+ <body>
+ <div id="root"></div>
+ 
+ <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+ <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+ <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+ 
+ <script type="text/babel">
+     const API_URL = "https://pokeapi.co/api/v2/pokemon";
+ 
+     function PokemonList({ pokemons, onSelectPokemon }) {
+         return (
+             <div className="pokemon-list">
+                 {pokemons.map(pokemon => (
+                     <div 
+                         key={pokemon.id} 
+                         className="pokemon-card" 
+                         onClick={() => onSelectPokemon(pokemon.id)}
+                     >
+                         <img src={pokemon.image} alt={pokemon.name} />
+                         <h3>{pokemon.name}</h3>
+                         <p>ID: {pokemon.id}</p>
+                     </div>
+                 ))}
+             </div>
+         );
+     }
+ 
+     function PokemonDetails({pokemon, onClose}) {
+         if (!pokemon) return null;
+ 
+         return (
+             <div className={'pokemon-details active'}>
+                 <div className="close-button" onClick={onClose}>X</div>
+                 <h3>{pokemon.name}</h3>
+                 <img src={pokemon.image} alt={pokemon.name} />
+                 <h2>Typy:</h2>
+                 <ul>
+                     {pokemon.types.map(type => <li key={type}>{type}</li>)}
+                 </ul>     
+                 <h2>Statystyki:</h2>
+                 <ul>
+                     {pokemon.stats.map(stat => (
+                         <li key={stat.name}>{stat.name}: {stat.value}</li>
+                     ))}
+                 </ul>
+                 <h2>Wzrost:</h2>
+                 <p>{pokemon.height}</p>
+                 <h2>Waga:</h2>
+                 <p>{pokemon.weight}</p> 
+             </div>
+         );
+     }
+ 
+     const root = ReactDOM.createRoot(document.getElementById("root"));
 
-    <script type="text/babel">
-      const pokemon_list = React.getElementById("pokemon-list");
-      const pokemon_details = React.getElementById("pokemon-details");
-      const search = React.getElementById("search");
-      const loading = React.getElementById("loading");
+function App() {
+    const state = {
+        pokemons: [],
+        selectedPokemon: null,
+        isLoading: true,
+        searchTerm: ""
+    };
 
-const API_URL = "https://pokeapi.co/api/v2/pokemon";
+    async function fetchPokemons() {
+        state.isLoading = true;
+        render();
+        try {
+            const response = await fetch(`${API_URL}?limit=20`);
+            const data = await response.json();
+            const pokemonDetails = await Promise.all(
+                data.results.map(async (pokemon) => {
+                    const id = pokemon.url.split("/").filter(Boolean).pop();
+                    const details = await fetch(`${API_URL}/${id}`);
+                    const detailsData = await details.json();
+                    return {
+                        id,
+                        name: pokemon.name,
+                        image: detailsData.sprites.front_default,
+                    };
+                })
+            );
+            state.pokemons = pokemonDetails.filter(pokemon => pokemon !== null);
+            state.isLoading = false;
+            render();
+        } catch (error) {
+            console.error("Błąd przy pobieraniu Pokémonów:", error);
+            state.isLoading = false;
+            render(); 
+        }
+    }
 
-async function fetchListPokemons() {
-  loading.style.display = "block";
-  const response = await fetch(API_URL + "?limit=20");
-  if (!response.ok) {
-    loading.style.display = "none";
-    console.error("Brak podczas pobierania");
-    return;
-  }
-  data = await response.json();
-  loading.style.display = "none";
-  showList(data.results);
+    async function fetchPokemonDetails(id) {
+        state.isLoading = true;
+        render();
+        try {
+            const response = await fetch(`${API_URL}/${id}`);
+            const data = await response.json();
+            state.selectedPokemon = {
+                name: data.name,
+                image: data.sprites.front_default,
+                types: data.types.map(el => el.type.name),
+                stats: data.stats.map(el => ({ name: el.stat.name, value: el.base_stat })),
+                height: data.height,
+                weight: data.weight
+            };
+            state.isLoading = false;
+            render();
+        } catch (error) {
+            console.error("Błąd przy pobieraniu szczegółów Pokémona");
+            state.isLoading = false;
+            render();
+        }
+    }
+
+    function clearSelection() {
+        state.selectedPokemon = null;
+        render();
+    }
+
+    function handleSearch(event) {
+        if (event.key === "Enter") {  
+            state.searchTerm = event.target.value.toLowerCase();
+            render();
+        }
+    }
+
+    function render() {
+        const filteredPokemons = state.pokemons.filter(pokemon =>
+            pokemon.name.toLowerCase().includes(state.searchTerm)
+        );
+
+        root.render(  
+            <div className="container">
+                <header>
+                    <h1>Pokemon GO</h1>
+                    <input 
+                        type="text"
+                        placeholder="Wyszukaj Pokemona..."
+                        onKeyDown={handleSearch}  
+                    />    
+                </header>
+                <div className="main-content">
+                    {state.isLoading ? (
+                        <p>Ladowanie...</p>
+                    ) : (
+                        <>
+                            <PokemonList 
+                                pokemons={filteredPokemons} 
+                                onSelectPokemon={fetchPokemonDetails} 
+                            />
+                            <PokemonDetails 
+                                pokemon={state.selectedPokemon} 
+                                onClose={clearSelection} 
+                            />
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    fetchPokemons();  
+    render();  
 }
 
-function showList(pokemons) {
-  pokemon_list.innerHTML = "";
-  const elements = pokemons.map((pokemon) => {
-    const pokemonId = pokemon.url.split("/").pop();
-    return fetch(`${API_URL}/${pokemonId}`)
-      .then((response) => response.json())
-      .then((pokemonData) => {
-        return {
-          pokemonId,
-          name: pokemon.name,
-          image: pokemonData.sprites.front_default,
-        };
-      })
-      .catch((error) => {
-        console.error("Blad przy pobieraniu szczegolow");
-      });
-  });
+App()
+ </script>
+ 
+ </body>
+ </html>
 
-  Promise.all(elements)
-    .then((elements) => {
-      elements.map((elem) => {
-        const pokemonCard = React.createElement("div");
-        pokemonCard.classList.add("pokemon-card");
 
-        const pokemonImage = React.createElement("img");
-        pokemonImage.src = elem.image;
-        pokemonImage.alt = elem.name;
 
-        const pokemonName = React.createElement("h3");
-        pokemonName.textContent = elem.name;
 
-        const pokemonId = React.createElement("p");
-        pokemonId.textContent = elem.pokemonId;
 
-        pokemonCard.addEventListener("click", () => {
-          fetchPokemonDetails(elem.pokemonId);
-        });
 
-        pokemonCard.appendChild(pokemonImage);
-        pokemonCard.appendChild(pokemonName);
-        pokemonCard.appendChild(pokemonId);
-        pokemon_list.appendChild(pokemonCard);
-      });
-    })
-    .catch((error) => console.error("Blad przy pobieraniu danych"));
+body {
+
+    font-family: Arial, sans-serif;
+
+    background-color: #f4f4f9;
+
+    margin: 0;
+
+    padding: 0;
+
+    height: auto;
+
+    width: auto;
+
 }
 
-async function fetchPokemonDetails(id) {
-  loading.style.display = "block";
-  const response = await fetch(`${API_URL}/${id}`);
+ 
 
-  if (response.ok) {
-    const pokemon = await response.json();
-    loading.style.display = "none";
-    showDetails(pokemon);
-  } else {
-    loading.style.display = "none";
-    console.error("Blad pobierania szczegolow");
-  }
+.container {
+
+    width: 80%;
+
+    margin: 0 auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    margin-bottom: 500px;
+
+    height: auto;
+
 }
 
-function showDetails(pokemon) {
-  pokemon_details.style.display = "block";
-  pokemon_details.innerHTML = "";
+ 
 
-  const pokemonName = React.createElement("h3");
-  pokemonName.textContent = pokemon.name;
+header {
 
-  const pokemonImage = React.createElement("img");
-  pokemonImage.src = `${pokemon.sprites.front_default}`;
-  pokemonImage.alt = pokemon.name;
+    text-align: center;
 
-  const pokemonTypes = React.createElement("h2");
-  pokemonTypes.textContent = "Typy:";
-  const typesList = React.createElement("ul");
-  pokemon.types.map((type) => {
-    const typeItem = React.createElement("li");
-    typeItem.textContent = type.type.name;
-    typesList.appendChild(typeItem);
-  });
+    margin: 20px 0;
 
-  const pokemonStats = React.createElement("h2");
-  pokemonStats.textContent = "Statystyki:";
-  const statsList = Raect.createElement("ul");
-  pokemon.stats.map((stat) => {
-    const statItem = Raect.createElement("li");
-    statItem.textContent = `${stat.stat.name}: ${stat.base_stat}`;
-    statsList.appendChild(statItem);
-  });
-
-  const pokemonHeight = React.createElement("h2");
-  pokemonHeight.textContent = `Wzrost: ${pokemon.height}`;
-
-  const pokemonWeight = React.createElement("h2");
-  pokemonWeight.textContent = `Waga: ${pokemon.weight}`;
-
-  const closeButton = React.createElement("div");
-  closeButton.classList.add("close-button");
-  closeButton.textContent = "X";
-  closeButton.addEventListener("click", () => {
-    pokemon_details.innerHTML = "";
-    pokemon_details.style.display = "none";
-  });
-
-  pokemon_details.appendChild(closeButton);
-  pokemon_details.appendChild(pokemonName);
-  pokemon_details.appendChild(pokemonImage);
-  pokemon_details.appendChild(pokemonTypes);
-  pokemon_details.appendChild(typesList);
-  pokemon_details.appendChild(pokemonStats);
-  pokemon_details.appendChild(statsList);
-  pokemon_details.appendChild(pokemonHeight);
-  pokemon_details.appendChild(pokemonWeight);
 }
 
-search.addEventListener("input", function () {
-  const searchTerm = search.value.toLowerCase();
-  const allCards = [...React.querySelectorAll(".pokemon-card")];
-  allCards.map((card) => {
-    const pokemonName = card.querySelector("h3").textContent.toLowerCase();
-    card.style.display = pokemonName.includes(searchTerm) ? "" : "none";
-  });
-});
+ 
 
-fetchListPokemons();
+img {
 
-    </script>
-        <header>
-            <h1>Pokemon Go</h1>
-            <input type="text" id="search" placeholder="Wyszukaj Pokemona..." />
-        </header>
-    <div class="container">
+    height: 140px;
 
-        
-        <div id="pokemon-list" class="pokemon-list">
-        </div>
-        
-        <div id="pokemon-details" class="pokemon-details">
-        </div>
-        
-        <div id="loading" class="loading">
-            <p>Ładowanie...</p>
-        </div>
-    </div>
+    width: 300px;
 
-    <script src="app.js"></script> 
-</html>
+}
+
+ 
+
+input {
+
+    padding: 10px;
+
+    width: 100%;
+
+    max-width: 400px;
+
+    margin-top: 10px;
+
+    font-size: 16px;
+
+}
+
+ 
+
+.main-content {
+
+    display: flex;
+
+    width: 100%;
+
+}
+
+ 
+
+.pokemon-list {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-start;
+
+    margin-top: 20px;
+
+    width: 100%;
+
+    flex: 2;
+
+}
+
+ 
+
+.pokemon-card {
+
+    width: 170px;
+
+    height: auto;
+
+    text-align: center;
+
+    background-color: white;
+
+    margin: 10px;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    cursor: pointer;
+
+}
+
+ 
+
+.pokemon-card:hover {
+
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);  /* Zmieniony efekt hover */
+
+}
+
+ 
+
+.pokemon-card img {
+
+    width: 120px;
+
+    height: 120px;
+
+}
+
+ 
+
+.pokemon-card h3 {
+
+    font-size: 25px;
+
+}
+
+ 
+
+.pokemon-card p {
+
+    font-size: 17px;
+
+    font-style: italic;
+
+}
+
+ 
+
+.pokemon-details {
+
+    background-color: white;
+
+    padding: 20px;
+
+    margin-top: 20px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    width: 30%;
+
+    flex: 1;
+
+    margin-left: 20px;
+
+    display: none;
+
+    height: 800px;
+
+}
+
+ 
+
+.pokemon-details.active {
+
+    display: block;
+
+}
+
+ 
+
+.pokemon-details h2 {
+
+    text-align: center;
+
+    font-size: 25px;
+
+}
+
+ 
+
+.pokemon-details h3 {
+
+    text-align: center;
+
+    text-transform: capitalize;
+
+    font-size: 30px;
+
+}
+
+ 
+
+.pokemon-details li {
+
+    font-size: 20px;
+
+}
+
+ 
+
+.pokemon-details img {
+
+    height: 150px;
+
+    width: 150px;
+
+}
+
+ 
+
+.loading {
+
+    text-align: center;
+
+    display: none;
+
+    font-weight: bold;
+
+}
+
+ 
+
+.close-button {
+
+    text-align: right;
+
+    cursor: pointer;
+
+}
+
+
+
+
