@@ -440,5 +440,209 @@ input {
 }
 
 
+const API_URL = "https://pokeapi.co/api/v2/pokemon";
+
+function PokemonList({ pokemons, onSelectPokemon }) {
+    return (
+        <div className="pokemon-list">
+            {pokemons.map(pokemon => (
+                <div 
+                    key={pokemon.id} 
+                    className="pokemon-card" 
+                    onClick={() => onSelectPokemon(pokemon.id)}
+                >
+                    <img src={pokemon.image} alt={pokemon.name} />
+                    <h3>{pokemon.name}</h3>
+                    <p>ID: {pokemon.id}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function PokemonDetails({pokemon, onClose}) {
+    if (!pokemon) return null;
+
+    return (
+        <div className={'pokemon-details active'}>
+            <div className="close-button" onClick={onClose}>X</div>
+            <h3>{pokemon.name}</h3>
+            <img src={pokemon.image} alt={pokemon.name} />
+            <h2>Typy:</h2>
+            <ul>
+                {pokemon.types.map(type => <li key={type}>{type}</li>)}
+            </ul>     
+            <h2>Statystyki:</h2>
+            <ul>
+                {pokemon.stats.map(stat => (
+                    <li key={stat.name}>{stat.name}: {stat.value}</li>
+                ))}
+            </ul>
+            <h2>Wzrost:</h2>
+            <p>{pokemon.height}</p>
+            <h2>Waga:</h2>
+            <p>{pokemon.weight}</p> 
+        </div>
+    );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+function App() {
+const state = {
+   pokemons: [],
+   selectedPokemon: null,
+   isLoading: true,
+   searchTerm: ""
+};
+
+async function fetchPokemons() {
+    state.isLoading = true;
+    render();
+    let offset = 0;
+    const allPokemons = [];
+    
+    try {
+        while (true) {
+            const response = await fetch(`${API_URL}?offset=${offset}`);
+            const data = await response.json();
+
+            if (!data.results || data.results.length === 0) break;
+
+            const pokemonDetails = await Promise.all(
+                data.results.map(async (pokemon) => {
+                    const id = pokemon.url.split("/").filter(Boolean).pop();
+                    const detailsResponse = await fetch(`${API_URL}/${id}`);
+                    const detailsData = await detailsResponse.json();
+                    return {
+                        id,
+                        name: pokemon.name,
+                        image: detailsData.sprites.front_default,
+                    };
+                })
+            );
+
+            allPokemons.push(...pokemonDetails);
+
+            if (data.next) {
+                offset += 20; // Standardowa liczba Pokemonów na stronę w PokeAPI
+            } else {
+                break; // Zakończ, jeśli nie ma więcej stron
+            }
+        }
+
+        state.pokemons = allPokemons; 
+        state.isLoading = false;
+        render();
+    } catch (error) {
+        console.error("Błąd podczas pobierania wszystkich Pokémonów", error);
+        state.isLoading = false;
+        render();
+    }
+}
+
+
+async function fetchPokemonDetails(id) {
+   state.isLoading = true;
+   render();
+   try {
+       const response = await fetch(`${API_URL}/${id}`);
+       const data = await response.json();
+       state.selectedPokemon = {
+           name: data.name,
+           image: data.sprites.front_default,
+           types: data.types.map(el => el.type.name),
+           stats: data.stats.map(el => ({ name: el.stat.name, value: el.base_stat })),
+           height: data.height,
+           weight: data.weight
+       };
+       state.isLoading = false;
+       render();
+   } catch (error) {
+       console.error("Błąd przy pobieraniu szczegółów Pokémona");
+       state.isLoading = false;
+       render();
+   }
+}
+
+function clearSelection() {
+   state.selectedPokemon = null;
+   render();
+}
+
+function handleSearch(event) {
+   if (event.key === "Enter") {  
+       state.searchTerm = event.target.value.toLowerCase();
+       render();
+   }
+}
+
+function render() {
+   const filteredPokemons = state.pokemons.filter(pokemon =>
+       pokemon.name.toLowerCase().includes(state.searchTerm)
+   );
+
+   root.render(  
+       <div className="container">
+           <header>
+               <h1>Pokemon GO</h1>
+               <input 
+                   type="text"
+                   placeholder="Wyszukaj Pokemona..."
+                   onKeyDown={handleSearch}  
+               />    
+           </header>
+           <div className="main-content">
+               {state.isLoading ? (
+                   <p>Ladowanie...</p>
+               ) : (
+                   <>
+                       <PokemonList 
+                           pokemons={filteredPokemons} 
+                           onSelectPokemon={fetchPokemonDetails} 
+                       />
+                       <PokemonDetails 
+                           pokemon={state.selectedPokemon} 
+                           onClose={clearSelection} 
+                       />
+                   </>
+               )}
+           </div>
+       </div>
+   );
+}
+
+fetchPokemons();  
+render();  
+}
+
+
+App()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// root.render(<App />)
 
 
