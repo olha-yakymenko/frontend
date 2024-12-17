@@ -1,0 +1,47 @@
+/* Style dla całego nawigacyjnego paska */
+nav {
+    background-color: #333;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Lista elementów w nawigacji */
+ul {
+    display: flex;
+    justify-content: center;  /* Wyrównaj linki na środku */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Elementy listy (linki) */
+li {
+    margin: 0 15px;  /* Odstęp pomiędzy elementami */
+}
+
+/* Linki nawigacyjne */
+a {
+    color: black;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+
+
+/* Responsywność: Zmniejszanie układu na małych ekranach */
+@media (max-width: 768px) {
+    nav {
+        padding: 10px;
+    }
+
+    ul {
+        flex-direction: column;  /* Zmiana układu na kolumnowy na mniejszych ekranach */
+        align-items: center;
+    }
+
+    li {
+        margin: 10px 0;  /* Większy odstęp w wersji pionowej */
+    }
+}

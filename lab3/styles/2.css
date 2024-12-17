@@ -1,0 +1,75 @@
+/* Kontener listy Pokémonów */
+div {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Lista Pokémonów */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* Elementy listy (karty Pokémonów) */
+li {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Obrazek Pokémona */
+img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* Tytuł Pokémona */
+h3 {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #333;
+}
+
+/* Linki do detali Pokémona */
+a {
+    text-decoration: none;
+    color: black; /* Zachowaj domyślny kolor tekstu */
+}
+
+
+
+/* Responsywność */
+@media (max-width: 768px) {
+    /* Zmniejszamy szerokość kart */
+    li {
+      padding: 10px;
+    }
+
+    img {
+      width: 80px;
+      height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Zmniejszamy szerokość kart na bardzo małych ekranach */
+    li {
+      padding: 8px;
+    }
+
+    img {
+      width: 70px;
+      height: 70px;
+    }
+}

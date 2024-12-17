@@ -1,0 +1,255 @@
+body {
+
+  font-family: Arial, sans-serif;
+
+  background-color: #f4f4f9;
+
+  margin: 0;
+
+  padding: 0;
+
+  height: auto;
+
+  width: auto;
+
+}
+
+
+
+.container {
+
+  width: 80%;
+
+  margin: 0 auto;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  margin-bottom: 500px;
+
+  height: auto;
+
+}
+
+
+
+header {
+
+  text-align: center;
+
+  margin: 20px 0;
+
+}
+
+
+
+img {
+
+  height: 140px;
+
+  width: 300px;
+
+}
+
+
+
+input {
+
+  padding: 10px;
+
+  width: 100%;
+
+  max-width: 400px;
+
+  margin-top: 10px;
+
+  font-size: 16px;
+
+}
+
+
+
+.main-content {
+
+  display: flex;
+
+  width: 100%;
+
+}
+
+
+
+.pokemon-list {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content: flex-start;
+
+  margin-top: 20px;
+
+  width: 100%;
+
+  flex: 2;
+
+}
+
+
+
+.pokemon-card {
+
+  width: 170px;
+
+  height: auto;
+
+  text-align: center;
+
+  background-color: white;
+
+  margin: 10px;
+
+  padding: 10px;
+
+  border-radius: 8px;
+
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  cursor: pointer;
+
+}
+
+
+
+.pokemon-card:hover {
+
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);  /* Zmieniony efekt hover */
+
+}
+
+
+
+.pokemon-card img {
+
+  width: 120px;
+
+  height: 120px;
+
+}
+
+
+
+.pokemon-card h3 {
+
+  font-size: 25px;
+
+}
+
+
+
+.pokemon-card p {
+
+  font-size: 17px;
+
+  font-style: italic;
+
+}
+
+
+
+.pokemon-details {
+
+  background-color: white;
+
+  padding: 20px;
+
+  margin-top: 20px;
+
+  border-radius: 8px;
+
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  width: 30%;
+
+  flex: 1;
+
+  margin-left: 20px;
+
+  display: none;
+
+  height: 800px;
+
+}
+
+
+
+.pokemon-details.active {
+
+  display: block;
+
+}
+
+
+
+.pokemon-details h2 {
+
+  text-align: center;
+
+  font-size: 25px;
+
+}
+
+
+
+.pokemon-details h3 {
+
+  text-align: center;
+
+  text-transform: capitalize;
+
+  font-size: 30px;
+
+}
+
+
+
+.pokemon-details li {
+
+  font-size: 20px;
+
+}
+
+
+
+.pokemon-details img {
+
+  height: 150px;
+
+  width: 150px;
+
+}
+
+
+
+.loading {
+
+  text-align: center;
+
+  display: none;
+
+  font-weight: bold;
+
+}
+
+
+
+.close-button {
+
+  text-align: right;
+
+  cursor: pointer;
+
+}
