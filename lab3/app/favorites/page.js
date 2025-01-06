@@ -1,52 +1,81 @@
 
 
+// 'use client';
+
+// import { useState } from 'react';
+
+// export default function FavoritesPage() {
+//   const [isClient, setIsClient] = useState(false);
+  
+//   const [favorites, setFavorites] = useState(() => {
+//     if (typeof window !== 'undefined') {
+//       const stored = localStorage.getItem('favorites');
+//       return stored ? JSON.parse(stored) : [];
+//     }
+//     return [];
+//   });
+
+//   if (!isClient && typeof window !== 'undefined') {
+//     setIsClient(true);
+//   }
+
+//   const removeFavorite = (id) => {
+//     const updatedFavorites = favorites.filter((fav) => fav.id !== id);
+//     setFavorites(updatedFavorites);  
+//     if (typeof window !== 'undefined') {
+//       localStorage.setItem('favorites', JSON.stringify(updatedFavorites));  
+//     }
+//   };
+
+//   if (!isClient) return <div>Loading...</div>;
+
+//   return (
+//     <div className="favorites-page">
+//       {favorites.length > 0 ? (
+//         <div className="favorites-list">
+//           {favorites.map((pokemon, index) => (
+//             <div key={pokemon.id || index} className="favorite-item">
+//               <img src={pokemon.image} alt={pokemon.name} />
+//               <h3>{pokemon.name}</h3>
+//               <button onClick={() => removeFavorite(pokemon.id)}>Usuń</button>
+//             </div>
+//           ))}
+//         </div>
+//       ) : (
+//         <p>Nie masz ulubionych Pokémonów.</p>
+//       )}
+//     </div>
+//   );
+// }
+
 'use client';
 
 import { useState } from 'react';
 
 export default function FavoritesPage() {
-  // Sprawdzamy, czy kod działa po stronie klienta
-  const [isClient, setIsClient] = useState(false);
-  
-  // Inicjalizujemy favorites tylko po stronie klienta
   const [favorites, setFavorites] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('favorites');
-      return stored ? JSON.parse(stored) : [];
-    }
-    return [];
+    const stored = localStorage.getItem('favorites');
+    return stored ? JSON.parse(stored) : [];
   });
-
-  // Po stronie klienta ustawiamy flagę
-  if (!isClient && typeof window !== 'undefined') {
-    setIsClient(true);
-  }
 
   const removeFavorite = (id) => {
     const updatedFavorites = favorites.filter((fav) => fav.id !== id);
-    setFavorites(updatedFavorites);  // Zaktualizuj stan
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));  // Zapisz zaktualizowane ulubione Pokémony do localStorage
-    }
+    setFavorites(updatedFavorites);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   };
 
-  // Renderowanie tylko po stronie klienta
-  if (!isClient) return <div>Loading...</div>;
-
   return (
-    <div className="favorites-page">
+    <div>
       {favorites.length > 0 ? (
-        <div className="favorites-list">
-          {favorites.map((pokemon, index) => (
-            <div key={pokemon.id || index} className="favorite-item">
-              <img src={pokemon.image} alt={pokemon.name} />
-              <h3>{pokemon.name}</h3>
-              <button onClick={() => removeFavorite(pokemon.id)}>Usuń</button>
-            </div>
-          ))}
-        </div>
+        favorites.map((pokemon) => (
+          <div key={pokemon.id}>
+            <img src={pokemon.image} alt={pokemon.name} />
+            <span>{pokemon.name}</span>
+            <button onClick={() => removeFavorite(pokemon.id)}>Usuń</button>
+          </div>
+        ))
       ) : (
-        <p>Nie masz ulubionych Pokémonów.</p>
+        <p>Brak ulubionych Pokémonów.</p>
       )}
     </div>
   );

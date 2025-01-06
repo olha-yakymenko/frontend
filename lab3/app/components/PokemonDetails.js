@@ -8,29 +8,22 @@ export default function PokemonDetails({ pokemon }) {
     storedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
   }
 
-  // Funkcja obsługująca dodawanie lub usuwanie z ulubionych
   const handleFavorite = (pokemon) => {
     let updatedFavorites = [];
     
-    // Sprawdzamy, czy Pokémon jest już w ulubionych
     if (storedFavorites.some(fav => fav.name === pokemon.name)) {
-      // Jeśli tak, usuwamy go z ulubionych
       updatedFavorites = storedFavorites.filter(fav => fav.name !== pokemon.name);
     } else {
-      // Jeśli nie, dodajemy go do ulubionych
       updatedFavorites = [...storedFavorites, { id: pokemon.id, image: pokemon.image, name: pokemon.name }];
     }
 
-    // Zapisujemy zmienioną listę do localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     }
 
-    // Ponownie odczytujemy listę ulubionych z localStorage, aby zaktualizować UI
     storedFavorites = updatedFavorites;
   };
 
-  // Sprawdzamy, czy Pokémon jest już w ulubionych
   const isFavorite = storedFavorites.some(fav => fav.name === pokemon.name);
 
   if (!pokemon) return <div>Loading...</div>;
