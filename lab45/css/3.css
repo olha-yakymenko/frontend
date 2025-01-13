@@ -1,0 +1,82 @@
+/* body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+  } */
+
+  h1 {
+    text-align: center;
+    color: #555;
+  }
+
+  h2 {
+    margin-top: 20px;
+    text-align: center;
+    color: #666;
+  }
+
+  .pokemon-comparison {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 800px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+
+  .comparison-details {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  .pokemon {
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .pokemon img {
+    max-width: 150px;
+    height: auto;
+  }
+
+  button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 5px;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .previous-comparison, .current-comparison {
+    margin-top: 20px;
+    text-align: center;
+  }

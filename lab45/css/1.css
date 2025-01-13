@@ -1,0 +1,41 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+  }
+  
+  nav ol {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  nav ol li {
+    display: inline;
+    font-weight: bold;
+  }
+  
+  nav ol li a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  nav ol li a:hover {
+    color: #1d6fa5;
+  }
+  
+  nav ol li:nth-child(2), nav ol li:nth-child(4) {
+    margin: 0 8px;
+    color: #777;
+  }
+  
+  nav ol li:last-child {
+    font-weight: normal;
+    color: #555;
+  }
+  

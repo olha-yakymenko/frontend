@@ -1,0 +1,134 @@
+/* PokemonDetails.module.css */
+
+.pokemon-details {
+    font-family: Arial, sans-serif;
+    margin: 20px auto;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  form div {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  form input,
+  form textarea,
+  form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+  }
+  
+  form input[type="checkbox"] {
+    width: auto;
+  }
+  
+  form button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  form button:hover {
+    background-color: #0056b3;
+  }
+  
+  form div div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  div {
+    margin-bottom: 10px;
+  }
+  
+  .notes-container {
+    margin-top: 30px;
+  }
+  
+  .notes-container div {
+    padding: 15px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .notes-container h3 {
+    margin: 0 0 10px 0;
+    color: #222;
+  }
+  
+  .notes-container p {
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  .notes-container button {
+    margin-right: 10px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .notes-container button:hover {
+    background-color: #ddd;
+  }
+  
+  .notes-container button:nth-child(1) {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .notes-container button:nth-child(1):hover {
+    background-color: #218838;
+  }
+  
+  .notes-container button:nth-child(2) {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .notes-container button:nth-child(2):hover {
+    background-color: #c82333;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 5px;
+  }
+  
